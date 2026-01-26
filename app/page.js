@@ -54,3 +54,13 @@ export default function Home() {
     </main>
   );
 }
+import VoiceRecognition from "./components/VoiceRecognition";
+
+export default function Home() {
+  return (
+    <div>
+      <h1>My Voice Feature</h1>
+      <VoiceRecognition />
+    </div>
+  );
+}
