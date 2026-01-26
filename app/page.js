@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import useStore from './store/useStore';
+
 import WelcomeScreen from './components/WelcomeScreen';
 import HealthProfile from './components/HealthProfile';
 import AgeInput from './components/AgeInput';
@@ -9,16 +10,17 @@ import PlanSelection from './components/PlanSelection';
 import GuiderSetup from './components/GuiderSetup';
 import Dashboard from './components/Dashboard';
 import Shop from './components/Shop';
+import VoiceRecognition from './components/VoiceRecognition';
 
 export default function Home() {
   const { currentStep } = useStore();
   const [mounted, setMounted] = useState(false);
-  
+
   // Hydration fix for zustand persist
   useEffect(() => {
     setMounted(true);
   }, []);
-  
+
   if (!mounted) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -26,7 +28,7 @@ export default function Home() {
       </div>
     );
   }
-  
+
   const renderStep = () => {
     switch (currentStep) {
       case 'welcome':
@@ -47,20 +49,18 @@ export default function Home() {
         return <WelcomeScreen />;
     }
   };
-  
+
   return (
     <main>
       {renderStep()}
-    </main>
-  );
-}
-import VoiceRecognition from "./components/VoiceRecognition";
 
-export default function Home() {
-  return (
-    <div>
-      <h1>My Voice Feature</h1>
-      <VoiceRecognition />
-    </div>
+      {/* Example: show voice feature on dashboard */}
+      {currentStep === 'dashboard' && (
+        <section className="mt-6">
+          <h1 className="text-xl font-semibold">My Voice Feature</h1>
+          <VoiceRecognition />
+        </section>
+      )}
+    </main>
   );
 }
