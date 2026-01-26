@@ -13,6 +13,7 @@ import {
   AlertCircle,
   Bot
 } from 'lucide-react';
+import VoiceRecognition from './VoiceRecognition';
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -254,33 +255,44 @@ export default function ChatWidget() {
           </div>
 
           {/* Input with modern design */}
-          <div className="p-4 bg-white border-t border-gray-100">
-            <div className="flex items-end gap-3">
-              <div className="flex-1 relative">
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Ask TwinX anything about your health journey..."
-                  className="w-full resize-none rounded-2xl border border-gray-200 px-4 py-3 pr-12 text-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 max-h-32 bg-gray-50"
-                  rows={1}
-                  disabled={isLoading}
-                />
-              </div>
-              <button
-                onClick={sendMessage}
-                disabled={!input.trim() || isLoading}
-                className="p-3.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105 disabled:hover:scale-100"
-              >
-                <Send className="w-5 h-5" />
-              </button>
-            </div>
+         <div className="flex items-end gap-3">
+  <div className="flex-1 relative">
+    <textarea
+      value={input}
+      onChange={(e) => setInput(e.target.value)}
+      onKeyPress={handleKeyPress}
+      placeholder="Ask TwinX anything about your health journey..."
+      className="w-full resize-none rounded-2xl border border-gray-200 px-4 py-3 pr-20 text-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 max-h-32 bg-gray-50"
+      rows={1}
+      disabled={isLoading}
+    />
+
+    {/* 🎤 MIC BUTTON */}
+    <div className="absolute right-3 bottom-3">
+      <VoiceRecognition
+        onResult={(text) =>
+          setInput(prev => prev ? prev + ' ' + text : text)
+        }
+      />
+    </div>
+  </div>
+
+  <button
+    onClick={sendMessage}
+    disabled={!input.trim() || isLoading}
+    className="p-3.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105 disabled:hover:scale-100"
+  >
+    <Send className="w-5 h-5" />
+  </button>
+</div>
+
+
             <div className="flex items-center justify-center gap-2 mt-3 text-xs text-gray-400">
               <Bot className="w-3.5 h-3.5" />
               <span>AI Health Advisor • Not a substitute for medical advice</span>
             </div>
           </div>
-        </div>
+        
       )}
 
       {/* Report Modal */}
