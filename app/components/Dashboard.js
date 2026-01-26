@@ -48,6 +48,10 @@ const ChatWidget = dynamic(() => import('./ChatWidget'), {
   ssr: false 
 });
 
+const PersonalizedHealthDashboard = dynamic(() => import('./PersonalizedHealthDashboard'), { 
+  ssr: false 
+});
+
 export default function Dashboard() {
   const { 
     guiderName, 
@@ -77,6 +81,7 @@ export default function Dashboard() {
   const [showConfirmReset, setShowConfirmReset] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [showFuturePreview, setShowFuturePreview] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
   
   // Count completed tasks from dailyTasks (more reliable trigger)
   const completedCount = dailyTasks.filter(t => t.completed).length;
@@ -93,6 +98,11 @@ export default function Dashboard() {
   const daysRemaining = selectedPlan ? selectedPlan.days - currentDay + 1 : 0;
   const progress = selectedPlan ? ((currentDay - 1) / selectedPlan.days) * 100 : 0;
   const allTasksCompleted = dailyTasks.length > 0 && dailyTasks.every(t => t.completed);
+  
+  // Show Analytics Dashboard
+  if (showAnalytics) {
+    return <PersonalizedHealthDashboard onBack={() => setShowAnalytics(false)} />;
+  }
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -234,6 +244,16 @@ export default function Dashboard() {
                   <p className="text-gray-500 text-xs mt-1">Steps</p>
                 </div>
               </div>
+              
+              {/* View Analytics Button */}
+              <button
+                onClick={() => setShowAnalytics(true)}
+                className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl text-white font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                <BarChart3 className="w-5 h-5" />
+                View Full Analytics
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
           
