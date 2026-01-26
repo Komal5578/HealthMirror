@@ -10,8 +10,6 @@ import PlanSelection from './components/PlanSelection';
 import GuiderSetup from './components/GuiderSetup';
 import Dashboard from './components/Dashboard';
 import Shop from './components/Shop';
-import VoiceRecognition from './components/VoiceRecognition';
-
 export default function Home() {
   const { currentStep } = useStore();
   const [mounted, setMounted] = useState(false);
@@ -54,13 +52,7 @@ export default function Home() {
     <main>
       {renderStep()}
 
-      {/* Example: show voice feature on dashboard */}
-      {currentStep === 'dashboard' && (
-        <section className="mt-6">
-          <h1 className="text-xl font-semibold">My Voice Feature</h1>
-          <VoiceRecognition />
-        </section>
-      )}
+    
     </main>
   );
 }
