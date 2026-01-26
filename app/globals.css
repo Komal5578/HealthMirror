@@ -26,9 +26,13 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+  font-family: 'Exo 2', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  font-family: 'Exo 2', sans-serif;
 }
 
 @keyframes spin {

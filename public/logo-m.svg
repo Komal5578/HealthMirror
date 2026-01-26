@@ -1,0 +1,36 @@
+<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Left figure (cyan/turquoise) -->
+  <g opacity="0.9">
+    <ellipse cx="25" cy="15" rx="8" ry="8" fill="#00D9E1"/>
+    <path d="M25 25 Q20 30 18 45 L18 55 Q18 60 22 60 L28 60 Q32 60 32 55 L32 45 Q30 30 25 25" fill="#00D9E1"/>
+    <line x1="18" y1="35" x2="10" y2="45" stroke="#00D9E1" stroke-width="3" stroke-linecap="round"/>
+    <line x1="32" y1="35" x2="40" y2="45" stroke="#00D9E1" stroke-width="3" stroke-linecap="round"/>
+    <path d="M15 8 L20 12 M15 12 L18 15" stroke="#00D9E1" stroke-width="2" stroke-linecap="round" fill="none"/>
+  </g>
+  
+  <!-- Right figure (white/gray) -->
+  <g opacity="0.9">
+    <ellipse cx="75" cy="15" rx="8" ry="8" fill="#E8E8E8"/>
+    <path d="M75 25 Q80 30 82 45 L82 55 Q82 60 78 60 L72 60 Q68 60 68 55 L68 45 Q70 30 75 25" fill="#E8E8E8"/>
+    <line x1="82" y1="35" x2="90" y2="45" stroke="#E8E8E8" stroke-width="3" stroke-linecap="round"/>
+    <line x1="68" y1="35" x2="60" y2="45" stroke="#E8E8E8" stroke-width="3" stroke-linecap="round"/>
+    <path d="M85 8 L80 12 M85 12 L82 15" stroke="#E8E8E8" stroke-width="2" stroke-linecap="round" fill="none"/>
+  </g>
+  
+  <!-- Center connecting M shape -->
+  <path d="M35 50 L45 30 L50 40 L55 30 L65 50" stroke="#00B8D4" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Heartbeat/pulse wave at bottom -->
+  <path d="M30 75 L40 75 L43 70 L47 80 L50 75 L53 70 L57 80 L60 75 L70 75" stroke="#00D9E1" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Circuit-like decorative lines -->
+  <line x1="8" y1="20" x2="3" y2="20" stroke="#00D9E1" stroke-width="1.5"/>
+  <line x1="8" y1="30" x2="3" y2="30" stroke="#00D9E1" stroke-width="1.5"/>
+  <circle cx="3" cy="20" r="1.5" fill="#00D9E1"/>
+  <circle cx="3" cy="30" r="1.5" fill="#00D9E1"/>
+  
+  <line x1="92" y1="20" x2="97" y2="20" stroke="#E8E8E8" stroke-width="1.5"/>
+  <line x1="92" y1="30" x2="97" y2="30" stroke="#E8E8E8" stroke-width="1.5"/>
+  <circle cx="97" cy="20" r="1.5" fill="#E8E8E8"/>
+  <circle cx="97" cy="30" r="1.5" fill="#E8E8E8"/>
+</svg>

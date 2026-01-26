@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import useStore from '../store/useStore';
 import { 
   CheckCircle, 
@@ -100,8 +101,8 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Heart className="w-6 h-6 text-blue-600" />
-              <h1 className="text-xl font-medium text-gray-900">Healthcare Twin</h1>
+              <Image src="/logo-m.svg" alt="HealthMirror Logo" width={36} height={36} className="w-12 h-12" />
+              <h1 className="text-xl font-medium text-gray-900">HealthMirror</h1>
               <span className="hidden md:inline-block text-sm text-gray-500 ml-4">{guiderName}</span>
             </div>
             <div className="flex items-center gap-6">

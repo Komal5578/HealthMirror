@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import useStore from '../store/useStore';
 import { Heart, ChevronRight, Target, TrendingUp, Award } from 'lucide-react';
 
@@ -12,11 +13,11 @@ export default function WelcomeScreen() {
         {/* Logo and Title */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-6">
-            <Heart className="w-8 h-8 text-white" />
+            <Image src="/logo-m.svg" alt="HealthMirror Logo" width={40} height={40} className="w-12 h-12" />
           </div>
           
           <h1 className="text-5xl sm:text-6xl font-normal text-gray-900 mb-4">
-            Healthcare Twin
+            HealthMirror
           </h1>
           
           <p className="text-xl text-gray-600 mb-2">
