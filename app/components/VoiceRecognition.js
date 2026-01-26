@@ -1,42 +1,45 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { Mic } from 'lucide-react';
+import { useState } from 'react';
 
-export default function VoiceRecognition() {
-  const [text, setText] = useState("");
-
-  const SpeechRecognition =
-    typeof window !== "undefined" &&
-    (window.SpeechRecognition || window.webkitSpeechRecognition);
-
-  let recognition;
-
-  if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
-    recognition.lang = "en-IN";
-    recognition.continuous = false;
-  }
+export default function VoiceRecognition({ onResult }) {
+  const [listening, setListening] = useState(false);
 
   const startListening = () => {
-    if (!recognition) {
-      alert("Voice Recognition supported nahi hai");
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert('Voice recognition not supported in this browser');
       return;
     }
 
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
     recognition.start();
+    setListening(true);
 
     recognition.onresult = (event) => {
-      setText(event.results[0][0].transcript);
+      const transcript = event.results[0][0].transcript;
+      onResult(transcript);
+      setListening(false);
     };
+
+    recognition.onerror = () => setListening(false);
   };
 
   return (
-    <div>
-      <button onClick={startListening}>
-        🎤 Speak
-      </button>
-
-      <p>{text}</p>
-    </div>
+    <button
+      onClick={startListening}
+      className={`p-2 rounded-full ${
+        listening
+          ? 'bg-red-500 text-white'
+          : 'bg-blue-100 text-blue-600'
+      }`}
+      title="Speak"
+    >
+      <Mic className="w-4 h-4" />
+    </button>
   );
 }
