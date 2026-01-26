@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import useStore from '../store/useStore';
 import { 
@@ -24,7 +24,10 @@ import {
   Footprints,
   Timer,
   AlertCircle,
-  Lightbulb
+  Lightbulb,
+  TrendingUp,
+  Eye,
+  Activity
 } from 'lucide-react';
 
 const Avatar3D = dynamic(() => import('./Avatar3D'), { 
@@ -34,6 +37,10 @@ const Avatar3D = dynamic(() => import('./Avatar3D'), {
       <div className="animate-spin w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full"></div>
     </div>
   )
+});
+
+const FutureSelfPreview = dynamic(() => import('./FutureSelfPreview'), { 
+  ssr: false 
 });
 
 const ChatWidget = dynamic(() => import('./ChatWidget'), { 
@@ -58,12 +65,27 @@ export default function Dashboard() {
     failTask,
     advanceDay,
     setStep,
-    resetAll
+    resetAll,
+    healthScore,
+    bodyState,
+    vitalSigns,
+    updateHealthMetrics
   } = useStore();
   
   const [activeTab, setActiveTab] = useState('tasks');
   const [showConfirmReset, setShowConfirmReset] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [showFuturePreview, setShowFuturePreview] = useState(false);
+  
+  // Count completed tasks from dailyTasks (more reliable trigger)
+  const completedCount = dailyTasks.filter(t => t.completed).length;
+  
+  // Update health metrics when tasks change
+  useEffect(() => {
+    if (updateHealthMetrics) {
+      updateHealthMetrics();
+    }
+  }, [completedTasks.length, completedCount, currentDay, updateHealthMetrics]);
   
   const maxXP = guiderLevel * 100;
   const xpProgress = (guiderXP / maxXP) * 100;
@@ -118,7 +140,7 @@ export default function Dashboard() {
                 <p className="text-gray-500 text-sm mt-1">Your Health Companion</p>
               </div>
               
-              <Avatar3D height="400px" />
+              <Avatar3D height="350px" />
               
               <div className="mt-6">
                 <div className="flex justify-between items-center mb-3">
@@ -136,21 +158,58 @@ export default function Dashboard() {
                 </div>
               </div>
               
-              <button
-                onClick={() => setStep('shop')}
-                className="w-full mt-6 flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 rounded-lg text-white font-medium hover:bg-blue-700 transition-colors"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                Customize Avatar
-              </button>
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setStep('shop')}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 rounded-lg text-white font-medium hover:bg-blue-700 transition-colors"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  Customize
+                </button>
+                <button
+                  onClick={() => setShowFuturePreview(true)}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 rounded-lg text-white font-medium hover:bg-purple-700 transition-colors"
+                >
+                  <Eye className="w-5 h-5" />
+                  Future Self
+                </button>
+              </div>
             </div>
             
             {/* Quick Stats */}
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
               <h3 className="text-gray-900 font-medium mb-4 flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-blue-600" />
-                Quick Stats
+                Health Metrics
               </h3>
+              
+              {/* Vital Signs */}
+              <div className="space-y-3 mb-4">
+                {[
+                  { key: 'energyLevel', label: 'Energy', color: 'yellow' },
+                  { key: 'muscleStrength', label: 'Strength', color: 'red' },
+                  { key: 'heartHealth', label: 'Heart', color: 'pink' },
+                  { key: 'flexibility', label: 'Flexibility', color: 'purple' },
+                  { key: 'mentalWellness', label: 'Mental', color: 'blue' },
+                ].map(({ key, label, color }) => (
+                  <div key={key} className="flex items-center gap-3">
+                    <span className="text-xs text-gray-500 w-16">{label}</span>
+                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-500 bg-${color}-500`}
+                        style={{ 
+                          width: `${vitalSigns?.[key] || 50}%`,
+                          backgroundColor: color === 'yellow' ? '#eab308' : 
+                                          color === 'red' ? '#ef4444' : 
+                                          color === 'pink' ? '#ec4899' : 
+                                          color === 'purple' ? '#a855f7' : '#3b82f6'
+                        }}
+                      />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 w-8">{vitalSigns?.[key] || 50}%</span>
+                  </div>
+                ))}
+              </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
@@ -169,7 +228,7 @@ export default function Dashboard() {
                   <p className="text-gray-500 text-xs mt-1">Minutes</p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
-                  <Target className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+                  <Activity className="w-6 h-6 text-blue-600 mx-auto mb-2" />
                   <p className="text-2xl font-semibold text-gray-900">{totalSteps}</p>
                   <p className="text-gray-500 text-xs mt-1">Steps</p>
                 </div>
@@ -374,6 +433,11 @@ export default function Dashboard() {
             setSelectedTask(null);
           }}
         />
+      )}
+      
+      {/* Future Self Preview Modal */}
+      {showFuturePreview && (
+        <FutureSelfPreview onClose={() => setShowFuturePreview(false)} />
       )}
       
       {/* Chat Widget */}

@@ -5,18 +5,143 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import useStore from '../store/useStore';
 
+// Body scale configurations based on health state
+const getBodyConfig = (healthScore, healthGoal, bodyState, vitalSigns) => {
+  // Default config
+  let config = {
+    torsoWidth: 1,
+    torsoHeight: 1,
+    armWidth: 1,
+    legWidth: 1,
+    shoulderWidth: 1,
+    chestSize: 0,
+    skinGlow: 1,
+    posture: 0,
+  };
+  
+  // Use relevant vital sign based on health goal
+  const relevantScore = healthGoal?.id === 'muscle_gain' 
+    ? (vitalSigns?.muscleStrength || healthScore || 50)
+    : healthGoal?.id === 'cardio_health'
+    ? (vitalSigns?.heartHealth || healthScore || 50)
+    : healthGoal?.id === 'weight_loss'
+    ? (vitalSigns?.energyLevel || healthScore || 50)
+    : (healthScore || 50);
+  
+  // Adjust based on health goal and progress - MORE DRAMATIC changes
+  if (healthGoal?.id === 'muscle_gain') {
+    // Calculate a progressive scale - more visible changes
+    // From score 50 to 90, we want torso to go from 1.0 to 1.8
+    const progressRatio = Math.max(0, (relevantScore - 50) / 40); // 0 to 1 range
+    
+    const baseTorso = 1.0 + progressRatio * 0.8;       // 1.0 to 1.8
+    const baseArm = 1.0 + progressRatio * 1.0;         // 1.0 to 2.0 (arms grow more)
+    const baseLeg = 1.0 + progressRatio * 0.6;         // 1.0 to 1.6
+    const baseShoulder = 1.0 + progressRatio * 0.9;    // 1.0 to 1.9
+    const baseChest = progressRatio * 0.25;            // 0 to 0.25
+    
+    config = {
+      ...config,
+      torsoWidth: baseTorso,
+      armWidth: baseArm,
+      legWidth: baseLeg,
+      shoulderWidth: baseShoulder,
+      chestSize: baseChest,
+      skinGlow: 1 + progressRatio * 0.3,
+      posture: progressRatio * 0.15,
+    };
+    
+    // If starting below 50, show thin/weak state
+    if (relevantScore < 50) {
+      const weakRatio = (50 - relevantScore) / 20; // How weak (0-1)
+      config = {
+        ...config,
+        torsoWidth: 1 - weakRatio * 0.2,
+        armWidth: 1 - weakRatio * 0.25,
+        legWidth: 1 - weakRatio * 0.15,
+        shoulderWidth: 1 - weakRatio * 0.15,
+        chestSize: 0,
+        skinGlow: 1 - weakRatio * 0.2,
+        posture: -weakRatio * 0.1,
+      };
+    }
+  } else if (healthGoal?.id === 'weight_loss') {
+    const progressRatio = Math.max(0, (relevantScore - 50) / 40);
+    
+    if (relevantScore >= 50) {
+      // Getting fitter/slimmer
+      config = {
+        ...config,
+        torsoWidth: 1 - progressRatio * 0.15,
+        armWidth: 1 + progressRatio * 0.1,
+        legWidth: 1 - progressRatio * 0.1,
+        skinGlow: 1 + progressRatio * 0.2,
+        posture: progressRatio * 0.1,
+      };
+    } else {
+      // Overweight state
+      const overweightRatio = (50 - relevantScore) / 30;
+      config = {
+        ...config,
+        torsoWidth: 1 + overweightRatio * 0.4,
+        torsoHeight: 1 - overweightRatio * 0.1,
+        armWidth: 1 + overweightRatio * 0.2,
+        legWidth: 1 + overweightRatio * 0.25,
+        skinGlow: 1 - overweightRatio * 0.15,
+        posture: -overweightRatio * 0.1,
+      };
+    }
+  } else if (healthGoal?.id === 'cardio_health') {
+    const progressRatio = Math.max(0, (relevantScore - 50) / 40);
+    
+    if (relevantScore >= 50) {
+      config = {
+        ...config,
+        skinGlow: 1 + progressRatio * 0.4,
+        posture: progressRatio * 0.15,
+        torsoWidth: 1 + progressRatio * 0.1,
+      };
+    } else {
+      const weakRatio = (50 - relevantScore) / 30;
+      config = {
+        ...config,
+        skinGlow: 1 - weakRatio * 0.3,
+        posture: -weakRatio * 0.2,
+        torsoWidth: 1 - weakRatio * 0.15,
+      };
+    }
+  } else {
+    // General fitness
+    const progressRatio = Math.max(0, (relevantScore - 50) / 40);
+    config = {
+      ...config,
+      torsoWidth: 1 + progressRatio * 0.15,
+      armWidth: 1 + progressRatio * 0.15,
+      skinGlow: 1 + progressRatio * 0.2,
+      posture: progressRatio * 0.1,
+    };
+  }
+  
+  return config;
+};
+
 // Animated human-like avatar body with mood expressions
-function AvatarBody({ color, mood, equippedItems }) {
+function AvatarBody({ color, mood, equippedItems, bodyConfig }) {
   const bodyRef = useRef();
   const headRef = useRef();
   const leftArmRef = useRef();
   const rightArmRef = useRef();
   const [tearOffset, setTearOffset] = useState(0);
   
+  // Use body config for scaling
+  const { torsoWidth, torsoHeight, armWidth, legWidth, shoulderWidth, chestSize, skinGlow, posture } = bodyConfig || {
+    torsoWidth: 1, torsoHeight: 1, armWidth: 1, legWidth: 1, shoulderWidth: 1, chestSize: 0, skinGlow: 1, posture: 0
+  };
+  
   // Debug: Log mood to console
   useEffect(() => {
-    console.log('Avatar mood:', mood);
-  }, [mood]);
+    console.log('Avatar mood:', mood, 'Body config:', bodyConfig);
+  }, [mood, bodyConfig]);
   
   // Realistic skin tone instead of bright colors
   const skinTone = '#FFE0BD'; // Natural skin color
@@ -461,39 +586,60 @@ function AvatarBody({ color, mood, equippedItems }) {
         <meshStandardMaterial color={skinTone} roughness={0.8} />
       </mesh>
       
-      {/* Torso - more realistic body shape */}
-      <mesh position={[0, 0.75, 0]}>
+      {/* Torso - scales based on health state */}
+      <mesh position={[0, 0.75 + posture * 0.1, 0]} scale={[torsoWidth, torsoHeight, torsoWidth * 0.9]}>
         <capsuleGeometry args={[0.25, 0.5, 16, 32]} />
         <meshStandardMaterial color={shirtColor} />
       </mesh>
       
-      {/* Shoulders */}
-      <mesh position={[-0.3, 1.05, 0]}>
+      {/* Chest muscles (visible when muscular) */}
+      {chestSize > 0 && (
+        <>
+          <mesh position={[-0.1, 0.9, 0.15]} scale={[chestSize * 2, chestSize * 1.5, chestSize]}>
+            <sphereGeometry args={[0.5, 16, 16]} />
+            <meshStandardMaterial color={shirtColor} />
+          </mesh>
+          <mesh position={[0.1, 0.9, 0.15]} scale={[chestSize * 2, chestSize * 1.5, chestSize]}>
+            <sphereGeometry args={[0.5, 16, 16]} />
+            <meshStandardMaterial color={shirtColor} />
+          </mesh>
+        </>
+      )}
+      
+      {/* Shoulders - scale based on build */}
+      <mesh position={[-0.3 * shoulderWidth, 1.05 + posture * 0.05, 0]} scale={[shoulderWidth, 1, 1]}>
         <sphereGeometry args={[0.12, 16, 16]} />
         <meshStandardMaterial color={shirtColor} />
       </mesh>
-      <mesh position={[0.3, 1.05, 0]}>
+      <mesh position={[0.3 * shoulderWidth, 1.05 + posture * 0.05, 0]} scale={[shoulderWidth, 1, 1]}>
         <sphereGeometry args={[0.12, 16, 16]} />
         <meshStandardMaterial color={shirtColor} />
       </mesh>
       
-      {/* Arms - realistic with elbows */}
-      <group ref={leftArmRef} position={[-0.35, 1.0, 0]}>
+      {/* Arms - realistic with elbows, scaled for build */}
+      <group ref={leftArmRef} position={[-0.35 * shoulderWidth, 1.0, 0]}>
         {/* Upper arm */}
-        <mesh position={[0, -0.2, 0]} rotation={[0, 0, 0.2]}>
+        <mesh position={[0, -0.2, 0]} rotation={[0, 0, 0.2]} scale={[armWidth, 1, armWidth]}>
           <capsuleGeometry args={[0.08, 0.25, 8, 16]} />
           <meshStandardMaterial color={shirtColor} />
         </mesh>
         {/* Elbow */}
-        <mesh position={[-0.05, -0.4, 0]}>
+        <mesh position={[-0.05, -0.4, 0]} scale={[armWidth, armWidth, armWidth]}>
           <sphereGeometry args={[0.08, 16, 16]} />
           <meshStandardMaterial color={shirtColor} />
         </mesh>
         {/* Forearm */}
-        <mesh position={[-0.1, -0.6, 0]}>
+        <mesh position={[-0.1, -0.6, 0]} scale={[armWidth, 1, armWidth]}>
           <capsuleGeometry args={[0.07, 0.25, 8, 16]} />
           <meshStandardMaterial color={skinTone} roughness={0.8} />
         </mesh>
+        {/* Bicep bulge (when muscular) */}
+        {armWidth > 1.2 && (
+          <mesh position={[-0.02, -0.25, 0.05]} scale={[0.8, 0.5, 0.5]}>
+            <sphereGeometry args={[0.1, 16, 16]} />
+            <meshStandardMaterial color={skinTone} roughness={0.8} />
+          </mesh>
+        )}
         {/* Hand */}
         <mesh position={[-0.15, -0.8, 0]}>
           <sphereGeometry args={[0.08, 16, 16]} />
@@ -501,22 +647,29 @@ function AvatarBody({ color, mood, equippedItems }) {
         </mesh>
       </group>
       
-      <group ref={rightArmRef} position={[0.35, 1.0, 0]}>
+      <group ref={rightArmRef} position={[0.35 * shoulderWidth, 1.0, 0]}>
         {/* Upper arm */}
-        <mesh position={[0, -0.2, 0]} rotation={[0, 0, -0.2]}>
+        <mesh position={[0, -0.2, 0]} rotation={[0, 0, -0.2]} scale={[armWidth, 1, armWidth]}>
           <capsuleGeometry args={[0.08, 0.25, 8, 16]} />
           <meshStandardMaterial color={shirtColor} />
         </mesh>
         {/* Elbow */}
-        <mesh position={[0.05, -0.4, 0]}>
+        <mesh position={[0.05, -0.4, 0]} scale={[armWidth, armWidth, armWidth]}>
           <sphereGeometry args={[0.08, 16, 16]} />
           <meshStandardMaterial color={shirtColor} />
         </mesh>
         {/* Forearm */}
-        <mesh position={[0.1, -0.6, 0]}>
+        <mesh position={[0.1, -0.6, 0]} scale={[armWidth, 1, armWidth]}>
           <capsuleGeometry args={[0.07, 0.25, 8, 16]} />
           <meshStandardMaterial color={skinTone} roughness={0.8} />
         </mesh>
+        {/* Bicep bulge (when muscular) */}
+        {armWidth > 1.2 && (
+          <mesh position={[0.02, -0.25, 0.05]} scale={[0.8, 0.5, 0.5]}>
+            <sphereGeometry args={[0.1, 16, 16]} />
+            <meshStandardMaterial color={skinTone} roughness={0.8} />
+          </mesh>
+        )}
         {/* Hand */}
         <mesh position={[0.15, -0.8, 0]}>
           <sphereGeometry args={[0.08, 16, 16]} />
@@ -524,50 +677,78 @@ function AvatarBody({ color, mood, equippedItems }) {
         </mesh>
       </group>
       
-      {/* Hips/Waist */}
-      <mesh position={[0, 0.4, 0]}>
+      {/* Hips/Waist - scaled for build */}
+      <mesh position={[0, 0.4, 0]} scale={[torsoWidth * 0.95, 1, torsoWidth * 0.9]}>
         <cylinderGeometry args={[0.22, 0.25, 0.15, 16]} />
         <meshStandardMaterial color={pantsColor} />
       </mesh>
       
-      {/* Legs - realistic with knees */}
+      {/* Legs - realistic with knees, scaled for build */}
       {/* Left leg */}
-      <group position={[-0.12, 0.3, 0]}>
+      <group position={[-0.12 * torsoWidth, 0.3, 0]}>
         {/* Thigh */}
-        <mesh position={[0, -0.2, 0]}>
+        <mesh position={[0, -0.2, 0]} scale={[legWidth, 1, legWidth]}>
           <capsuleGeometry args={[0.11, 0.3, 8, 16]} />
           <meshStandardMaterial color={pantsColor} />
         </mesh>
         {/* Knee */}
-        <mesh position={[0, -0.42, 0]}>
+        <mesh position={[0, -0.42, 0]} scale={[legWidth, legWidth, legWidth]}>
           <sphereGeometry args={[0.1, 16, 16]} />
           <meshStandardMaterial color={pantsColor} />
         </mesh>
         {/* Shin */}
-        <mesh position={[0, -0.65, 0]}>
+        <mesh position={[0, -0.65, 0]} scale={[legWidth * 0.9, 1, legWidth * 0.9]}>
           <capsuleGeometry args={[0.09, 0.3, 8, 16]} />
           <meshStandardMaterial color={pantsColor} />
         </mesh>
+        {/* Calf muscle (when muscular) */}
+        {legWidth > 1.15 && (
+          <mesh position={[0, -0.55, -0.05]} scale={[0.6, 0.4, 0.3]}>
+            <sphereGeometry args={[0.15, 16, 16]} />
+            <meshStandardMaterial color={pantsColor} />
+          </mesh>
+        )}
       </group>
       
       {/* Right leg */}
-      <group position={[0.12, 0.3, 0]}>
+      <group position={[0.12 * torsoWidth, 0.3, 0]}>
         {/* Thigh */}
-        <mesh position={[0, -0.2, 0]}>
+        <mesh position={[0, -0.2, 0]} scale={[legWidth, 1, legWidth]}>
           <capsuleGeometry args={[0.11, 0.3, 8, 16]} />
           <meshStandardMaterial color={pantsColor} />
         </mesh>
         {/* Knee */}
-        <mesh position={[0, -0.42, 0]}>
+        <mesh position={[0, -0.42, 0]} scale={[legWidth, legWidth, legWidth]}>
           <sphereGeometry args={[0.1, 16, 16]} />
           <meshStandardMaterial color={pantsColor} />
         </mesh>
         {/* Shin */}
-        <mesh position={[0, -0.65, 0]}>
+        <mesh position={[0, -0.65, 0]} scale={[legWidth * 0.9, 1, legWidth * 0.9]}>
           <capsuleGeometry args={[0.09, 0.3, 8, 16]} />
           <meshStandardMaterial color={pantsColor} />
         </mesh>
+        {/* Calf muscle (when muscular) */}
+        {legWidth > 1.15 && (
+          <mesh position={[0, -0.55, -0.05]} scale={[0.6, 0.4, 0.3]}>
+            <sphereGeometry args={[0.15, 16, 16]} />
+            <meshStandardMaterial color={pantsColor} />
+          </mesh>
+        )}
       </group>
+      
+      {/* Health glow effect */}
+      {skinGlow > 1.1 && (
+        <mesh position={[0, 0.5, 0]}>
+          <sphereGeometry args={[1.2, 16, 16]} />
+          <meshStandardMaterial color="#4ade80" transparent opacity={0.08} />
+        </mesh>
+      )}
+      {skinGlow < 0.85 && (
+        <mesh position={[0, 0.5, 0]}>
+          <sphereGeometry args={[1.2, 16, 16]} />
+          <meshStandardMaterial color="#f87171" transparent opacity={0.1} />
+        </mesh>
+      )}
       
       {/* Feet - realistic shoes */}
       <mesh position={[-0.12, -0.92, 0.08]}>
@@ -623,7 +804,18 @@ function Platform() {
 
 // Scene
 function AvatarScene({ interactive }) {
-  const { avatarColor, guiderMood, guiderLevel, equippedItems } = useStore();
+  const { avatarColor, guiderMood, guiderLevel, equippedItems, healthScore, healthGoal, bodyState, vitalSigns } = useStore();
+  
+  // Calculate body configuration based on health
+  const bodyConfig = getBodyConfig(healthScore || 50, healthGoal, bodyState, vitalSigns);
+  
+  // Create a key that changes when body config changes to force re-render
+  const bodyKey = `${bodyConfig.torsoWidth}-${bodyConfig.armWidth}-${bodyConfig.chestSize}`;
+  
+  // Debug log
+  useEffect(() => {
+    console.log('AvatarScene - vitalSigns:', vitalSigns, 'bodyConfig:', bodyConfig, 'healthGoal:', healthGoal?.id);
+  }, [vitalSigns, bodyConfig, healthGoal]);
   
   return (
     <>
@@ -631,9 +823,14 @@ function AvatarScene({ interactive }) {
       <directionalLight position={[5, 5, 5]} intensity={0.8} />
       <pointLight position={[-3, 3, 3]} intensity={0.4} color="#FFB6C1" />
       
-      {/* Avatar scaled up and positioned properly */}
-      <group scale={1.2} position={[0, 0, 0]}>
-        <AvatarBody color={avatarColor} mood={guiderMood} equippedItems={equippedItems} />
+      {/* Avatar scaled up and positioned properly - key forces re-render when body changes */}
+      <group scale={1.2} position={[0, 0, 0]} key={bodyKey}>
+        <AvatarBody 
+          color={avatarColor} 
+          mood={guiderMood} 
+          equippedItems={equippedItems} 
+          bodyConfig={bodyConfig}
+        />
       </group>
       <LevelBadge level={guiderLevel} mood={guiderMood} />
       <Platform />
