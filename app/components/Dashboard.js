@@ -14,21 +14,10 @@ import {
   Target,
   ShoppingBag,
   BarChart3,
-  Clock,
   ArrowRight,
   Settings,
-  Heart,
   X,
-  Play,
-  Info,
-  Dumbbell,
-  Footprints,
-  Timer,
-  AlertCircle,
-  Lightbulb,
-  TrendingUp,
-  Eye,
-  Activity
+  Eye
 } from 'lucide-react';
 
 const Avatar3D = dynamic(() => import('./Avatar3D'), { 
@@ -64,15 +53,11 @@ export default function Dashboard() {
     dailyTasks,
     completedTasks,
     streakDays,
-    totalSteps,
-    totalWorkoutMinutes,
     completeTask,
     failTask,
     advanceDay,
     setStep,
     resetAll,
-    healthScore,
-    bodyState,
     vitalSigns,
     updateHealthMetrics
   } = useStore();
@@ -83,10 +68,8 @@ export default function Dashboard() {
   const [showFuturePreview, setShowFuturePreview] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   
-  // Count completed tasks from dailyTasks (more reliable trigger)
   const completedCount = dailyTasks.filter(t => t.completed).length;
   
-  // Update health metrics when tasks change
   useEffect(() => {
     if (updateHealthMetrics) {
       updateHealthMetrics();
@@ -99,69 +82,75 @@ export default function Dashboard() {
   const progress = selectedPlan ? ((currentDay - 1) / selectedPlan.days) * 100 : 0;
   const allTasksCompleted = dailyTasks.length > 0 && dailyTasks.every(t => t.completed);
   
-  // Show Analytics Dashboard
   if (showAnalytics) {
     return <PersonalizedHealthDashboard onBack={() => setShowAnalytics(false)} />;
   }
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-gray-50 to-purple-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Image src="/logo-m.svg" alt="HealthMirror Logo" width={36} height={36} className="w-12 h-12" />
-              <h1 className="text-xl font-medium text-gray-900">HealthMirror</h1>
-              <span className="hidden md:inline-block text-sm text-gray-500 ml-4">{guiderName}</span>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <button 
+                onClick={() => setStep('welcome')}
+                className="flex items-center gap-2 sm:gap-4 hover:opacity-80 transition-opacity cursor-pointer"
+              >
+                <Image src="/logo-m.svg" alt="HealthMirror Logo" width={36} height={36} className="w-8 h-8 sm:w-12 sm:h-12" />
+                <h1 className="text-base sm:text-xl font-medium text-gray-900">HealthMirror</h1>
+              </button>
+              <span className="hidden lg:inline-block text-sm text-gray-500 ml-4">{guiderName}</span>
             </div>
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-6 text-sm text-gray-700">
-                <div className="flex items-center gap-2">
-                  <Coins className="w-4 h-4 text-blue-600" />
+            <div className="flex items-center gap-2 sm:gap-6">
+              <div className="flex items-center gap-2 sm:gap-6 text-xs sm:text-sm text-gray-700">
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <Coins className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
                   <span className="font-medium">{coins}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Flame className="w-4 h-4 text-orange-500" />
-                  <span className="font-medium">{streakDays} days</span>
+                <div className="hidden xs:flex items-center gap-1 sm:gap-2">
+                  <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500" />
+                  <span className="font-medium">{streakDays}d</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-2">
                   <Trophy className="w-4 h-4 text-blue-600" />
-                  <span className="font-medium">Level {guiderLevel}</span>
+                  <span className="font-medium">Lv {guiderLevel}</span>
                 </div>
               </div>
               <button 
                 onClick={() => setShowConfirmReset(true)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <Settings className="w-5 h-5 text-gray-600" />
+                <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
               </button>
             </div>
           </div>
         </div>
       </header>
       
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
           {/* Left Column - Avatar */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
-              <div className="text-center mb-6">
-                <h2 className="text-xl font-medium text-gray-900">{guiderName}</h2>
-                <p className="text-gray-500 text-sm mt-1">Your Health Companion</p>
+          <div className="lg:col-span-5 space-y-4 sm:space-y-6">
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-sm">
+              <div className="text-center mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-xl font-medium text-gray-900">{guiderName}</h2>
+                <p className="text-gray-500 text-xs sm:text-sm mt-1">Your Health Companion</p>
               </div>
               
-              <Avatar3D height="350px" />
+              <div className="h-[250px] sm:h-[300px] lg:h-[350px]">
+                <Avatar3D height="100%" />
+              </div>
               
-              <div className="mt-6">
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-gray-900 font-medium flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-blue-600" />
+              <div className="mt-4 sm:mt-6">
+                <div className="flex justify-between items-center mb-2 sm:mb-3">
+                  <span className="text-gray-900 font-medium flex items-center gap-1 sm:gap-2 text-sm sm:text-base">
+                    <Trophy className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                     Level {guiderLevel}
                   </span>
-                  <span className="text-gray-500 text-sm">{guiderXP}/{maxXP} XP</span>
+                  <span className="text-gray-500 text-xs sm:text-sm">{guiderXP}/{maxXP} XP</span>
                 </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-1.5 sm:h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-blue-600 rounded-full transition-all duration-500"
                     style={{ width: `${xpProgress}%` }}
@@ -169,45 +158,47 @@ export default function Dashboard() {
                 </div>
               </div>
               
-              <div className="flex gap-3 mt-6">
+              <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6">
                 <button
                   onClick={() => setStep('shop')}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 rounded-lg text-white font-medium hover:bg-blue-700 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-blue-600 rounded-lg text-white font-medium hover:bg-blue-700 transition-colors text-sm sm:text-base"
                 >
-                  <ShoppingBag className="w-5 h-5" />
+                  <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
                   Customize
                 </button>
                 <button
                   onClick={() => setShowFuturePreview(true)}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 rounded-lg text-white font-medium hover:bg-purple-700 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-purple-600 rounded-lg text-white font-medium hover:bg-purple-700 transition-colors text-sm sm:text-base"
                 >
-                  <Eye className="w-5 h-5" />
+                  <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
                   Future Self
                 </button>
               </div>
             </div>
             
             {/* Quick Stats */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-              <h3 className="text-gray-900 font-medium mb-4 flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-blue-600" />
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+              <h3 className="text-gray-900 font-medium mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 Health Metrics
               </h3>
               
               {/* Vital Signs */}
-              <div className="space-y-3 mb-4">
-                {[
-                  { key: 'energyLevel', label: 'Energy', color: 'yellow' },
-                  { key: 'muscleStrength', label: 'Strength', color: 'red' },
-                  { key: 'heartHealth', label: 'Heart', color: 'pink' },
-                  { key: 'flexibility', label: 'Flexibility', color: 'purple' },
-                  { key: 'mentalWellness', label: 'Mental', color: 'blue' },
-                ].map(({ key, label, color }) => (
-                  <div key={key} className="flex items-center gap-3">
-                    <span className="text-xs text-gray-500 w-16">{label}</span>
-                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="space-y-2 sm:space-y-3 mb-3 sm:mb-4">
+                {(
+                  [
+                    { key: 'energyLevel', label: 'Energy', color: 'yellow' },
+                    { key: 'muscleStrength', label: 'Strength', color: 'red' },
+                    { key: 'heartHealth', label: 'Heart', color: 'pink' },
+                    { key: 'flexibility', label: 'Flexibility', color: 'purple' },
+                    { key: 'mentalWellness', label: 'Mental', color: 'blue' },
+                  ]
+                ).map(({ key, label, color }) => (
+                  <div key={key} className="flex items-center gap-2 sm:gap-3">
+                    <span className="text-[10px] sm:text-xs text-gray-500 w-14 sm:w-16">{label}</span>
+                    <div className="flex-1 h-1.5 sm:h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div 
-                        className={`h-full rounded-full transition-all duration-500 bg-${color}-500`}
+                        className="h-full rounded-full transition-all duration-500"
                         style={{ 
                           width: `${vitalSigns?.[key] || 50}%`,
                           backgroundColor: color === 'yellow' ? '#eab308' : 
@@ -217,68 +208,57 @@ export default function Dashboard() {
                         }}
                       />
                     </div>
-                    <span className="text-xs font-medium text-gray-700 w-8">{vitalSigns?.[key] || 50}%</span>
+                    <span className="text-[10px] sm:text-xs font-medium text-gray-700 w-6 sm:w-8">{vitalSigns?.[key] || 50}%</span>
                   </div>
                 ))}
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
-                  <Flame className="w-6 h-6 text-orange-500 mx-auto mb-2" />
-                  <p className="text-2xl font-semibold text-gray-900">{streakDays}</p>
-                  <p className="text-gray-500 text-xs mt-1">Day Streak</p>
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-gray-100">
+                  <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 mx-auto mb-1 sm:mb-2" />
+                  <p className="text-lg sm:text-2xl font-semibold text-gray-900">{streakDays}</p>
+                  <p className="text-gray-500 text-[10px] sm:text-xs mt-0.5 sm:mt-1">Day Streak</p>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
-                  <Target className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                  <p className="text-2xl font-semibold text-gray-900">{completedTasks.length}</p>
-                  <p className="text-gray-500 text-xs mt-1">Tasks Done</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
-                  <Clock className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <p className="text-2xl font-semibold text-gray-900">{totalWorkoutMinutes}</p>
-                  <p className="text-gray-500 text-xs mt-1">Minutes</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
-                  <Activity className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <p className="text-2xl font-semibold text-gray-900">{totalSteps}</p>
-                  <p className="text-gray-500 text-xs mt-1">Steps</p>
+                <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-gray-100">
+                  <Target className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 mx-auto mb-1 sm:mb-2" />
+                  <p className="text-lg sm:text-2xl font-semibold text-gray-900">{completedTasks.length}</p>
+                  <p className="text-gray-500 text-[10px] sm:text-xs mt-0.5 sm:mt-1">Tasks Done</p>
                 </div>
               </div>
               
-              {/* View Analytics Button */}
               <button
                 onClick={() => setShowAnalytics(true)}
-                className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl text-white font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="w-full mt-3 sm:mt-4 flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg sm:rounded-xl text-white font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base"
               >
-                <BarChart3 className="w-5 h-5" />
+                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
                 View Full Analytics
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>
           
           {/* Right Column - Tasks */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7 space-y-4 sm:space-y-6">
             {/* Progress Card */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
                 <div>
-                  <h3 className="text-xl font-medium text-gray-900">{healthGoal?.name}</h3>
-                  <p className="text-gray-500 text-sm mt-1">{selectedPlan?.name} - {daysRemaining} days remaining</p>
+                  <h3 className="text-base sm:text-xl font-medium text-gray-900">{healthGoal?.name}</h3>
+                  <p className="text-gray-500 text-xs sm:text-sm mt-0.5 sm:mt-1">{selectedPlan?.name} - {daysRemaining} days remaining</p>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Calendar className="w-4 h-4" />
+                <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600">
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                   Day {currentDay}
                 </div>
               </div>
               
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-1.5 sm:h-2 bg-gray-100 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-blue-600 rounded-full transition-all duration-500"
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <div className="flex justify-between mt-2 text-sm text-gray-500">
+              <div className="flex justify-between mt-1.5 sm:mt-2 text-xs sm:text-sm text-gray-500">
                 <span>Day 1</span>
                 <span className="text-blue-600 font-medium">{Math.round(progress)}% Complete</span>
                 <span>Day {selectedPlan?.days}</span>
@@ -286,10 +266,10 @@ export default function Dashboard() {
             </div>
             
             {/* Tabs */}
-            <div className="flex gap-2 bg-gray-100 rounded-xl p-1">
+            <div className="flex gap-1 sm:gap-2 bg-gray-100 rounded-lg sm:rounded-xl p-1">
               <button
                 onClick={() => setActiveTab('tasks')}
-                className={`flex-1 py-2.5 rounded-lg font-medium text-sm transition-all ${
+                className={`flex-1 py-2 sm:py-2.5 rounded-md sm:rounded-lg font-medium text-xs sm:text-sm transition-all ${
                   activeTab === 'tasks' 
                     ? 'bg-white text-gray-900 shadow-sm' 
                     : 'text-gray-600 hover:text-gray-900'
@@ -299,7 +279,7 @@ export default function Dashboard() {
               </button>
               <button
                 onClick={() => setActiveTab('history')}
-                className={`flex-1 py-2.5 rounded-lg font-medium text-sm transition-all ${
+                className={`flex-1 py-2 sm:py-2.5 rounded-md sm:rounded-lg font-medium text-xs sm:text-sm transition-all ${
                   activeTab === 'history' 
                     ? 'bg-white text-gray-900 shadow-sm' 
                     : 'text-gray-600 hover:text-gray-900'
@@ -311,60 +291,56 @@ export default function Dashboard() {
             
             {/* Tasks List */}
             {activeTab === 'tasks' && (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {dailyTasks.length === 0 ? (
-                  <div className="bg-white rounded-2xl p-8 text-center border border-gray-200">
-                    <h3 className="text-gray-900 font-medium text-xl mb-2">No tasks yet</h3>
-                    <p className="text-gray-500">Your daily tasks will appear here</p>
+                  <div className="bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center border border-gray-200">
+                    <h3 className="text-gray-900 font-medium text-lg sm:text-xl mb-1 sm:mb-2">No tasks yet</h3>
+                    <p className="text-gray-500 text-sm">Your daily tasks will appear here</p>
                   </div>
                 ) : (
                   <>
                     {dailyTasks.map((task) => (
                       <div 
                         key={task.id}
-                        className={`bg-white rounded-xl p-5 border transition-all cursor-pointer ${
+                        className={`bg-white rounded-lg sm:rounded-xl p-3 sm:p-5 border transition-all cursor-pointer ${
                           task.completed 
                             ? 'border-green-300 bg-green-50' 
                             : 'border-gray-200 hover:border-blue-300 hover:shadow-md'
                         }`}
                         onClick={() => !task.completed && setSelectedTask(task)}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <h4 className={`font-medium ${task.completed ? 'text-green-700 line-through' : 'text-gray-900'}`}>
+                        <div className="flex items-center justify-between gap-2 sm:gap-4">
+                          <div className="flex-1 min-w-0">
+                            <h4 className={`font-medium text-sm sm:text-base truncate ${task.completed ? 'text-green-700 line-through' : 'text-gray-900'}`}>
                               {task.name}
                             </h4>
-                            <div className="flex items-center gap-4 mt-2 text-sm">
-                              <span className="text-gray-500">
-                                {task.duration}
-                              </span>
-                              <span className="text-blue-600">
-                                +{task.coins}
-                              </span>
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 sm:mt-2 text-xs sm:text-sm">
+                              <span className="text-gray-500">{task.duration}</span>
+                              <span className="text-blue-600">+{task.coins}</span>
                               <span className="text-gray-600">+{task.xp} XP</span>
                             </div>
                           </div>
                           
                           {!task.completed && (
-                            <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex gap-1.5 sm:gap-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                               <button
                                 onClick={() => completeTask(task.id)}
-                                className="p-2.5 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg transition-colors border border-green-200"
+                                className="p-2 sm:p-2.5 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg transition-colors border border-green-200"
                               >
-                                <CheckCircle className="w-5 h-5" />
+                                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                               </button>
                               <button
                                 onClick={() => failTask(task.id)}
-                                className="p-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors border border-red-200"
+                                className="p-2 sm:p-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors border border-red-200"
                               >
-                                <XCircle className="w-5 h-5" />
+                                <XCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                               </button>
                             </div>
                           )}
                           
                           {task.completed && (
-                            <div className="p-2.5 bg-green-100 text-green-600 rounded-lg">
-                              <CheckCircle className="w-5 h-5" />
+                            <div className="p-2 sm:p-2.5 bg-green-100 text-green-600 rounded-lg flex-shrink-0">
+                              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                             </div>
                           )}
                         </div>
@@ -374,10 +350,10 @@ export default function Dashboard() {
                     {allTasksCompleted && (
                       <button
                         onClick={advanceDay}
-                        className="w-full flex items-center justify-center gap-3 py-4 bg-blue-600 hover:bg-blue-700 rounded-xl text-white font-medium transition-colors"
+                        className="w-full flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 rounded-lg sm:rounded-xl text-white font-medium transition-colors text-sm sm:text-base"
                       >
                         Continue to Day {currentDay + 1}
-                        <ArrowRight className="w-5 h-5" />
+                        <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
                     )}
                   </>
@@ -387,21 +363,21 @@ export default function Dashboard() {
             
             {/* History Tab */}
             {activeTab === 'history' && (
-              <div className="bg-white rounded-2xl p-6 border border-gray-200">
-                <h4 className="font-medium text-gray-900 mb-4">Completed Tasks</h4>
+              <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200">
+                <h4 className="font-medium text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">Completed Tasks</h4>
                 {completedTasks.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">No completed tasks yet</p>
+                  <p className="text-gray-500 text-center py-6 sm:py-8 text-sm">No completed tasks yet</p>
                 ) : (
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                  <div className="space-y-2 max-h-72 sm:max-h-96 overflow-y-auto">
                     {completedTasks.slice(-10).reverse().map((task, i) => (
-                      <div key={i} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                        <div>
-                          <p className="text-gray-900 font-medium">{task.name}</p>
-                          <p className="text-gray-500 text-sm">Day {task.completedDay}</p>
+                      <div key={i} className="flex items-center justify-between py-2 sm:py-3 border-b border-gray-100 last:border-0 gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-gray-900 font-medium text-sm truncate">{task.name}</p>
+                          <p className="text-gray-500 text-xs sm:text-sm">Day {task.completedDay}</p>
                         </div>
-                        <div className="flex items-center gap-3 text-sm">
-                          <span className="text-blue-600">+{task.coins} coins</span>
-                          <span className="text-gray-600">+{task.xp} XP</span>
+                        <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm flex-shrink-0">
+                          <span className="text-blue-600">+{task.coins}</span>
+                          <span className="text-gray-600 hidden xs:inline">+{task.xp} XP</span>
                         </div>
                       </div>
                     ))}
@@ -416,13 +392,13 @@ export default function Dashboard() {
       {/* Reset Confirmation Modal */}
       {showConfirmReset && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full">
-            <h3 className="text-xl font-medium text-gray-900 mb-2">Reset Progress?</h3>
-            <p className="text-gray-600 mb-6">This will reset all your progress and start over. This action cannot be undone.</p>
-            <div className="flex gap-3">
+          <div className="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-8 max-w-md w-full mx-4">
+            <h3 className="text-lg sm:text-xl font-medium text-gray-900 mb-1 sm:mb-2">Reset Progress?</h3>
+            <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">This will reset all your progress and start over. This action cannot be undone.</p>
+            <div className="flex gap-2 sm:gap-3">
               <button
                 onClick={() => setShowConfirmReset(false)}
-                className="flex-1 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                className="flex-1 py-2.5 sm:py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors text-sm sm:text-base"
               >
                 Cancel
               </button>
@@ -431,7 +407,7 @@ export default function Dashboard() {
                   resetAll();
                   setShowConfirmReset(false);
                 }}
-                className="flex-1 py-3 bg-red-600 rounded-lg text-white font-medium hover:bg-red-700 transition-colors"
+                className="flex-1 py-2.5 sm:py-3 bg-red-600 rounded-lg text-white font-medium hover:bg-red-700 transition-colors text-sm sm:text-base"
               >
                 Reset
               </button>
@@ -1280,117 +1256,40 @@ function getTaskInfo(taskName) {
 
 // Task Info Modal Component
 function TaskInfoModal({ task, onClose, onComplete, onFail }) {
-  const info = getTaskInfo(task.name);
-  
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-t-3xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">{task.name}</h2>
-              <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4">
+      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-t-2xl sm:rounded-t-3xl sticky top-0 z-10">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{task.name}</h2>
+              <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500 mt-1">
                 <span>{task.duration}</span>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  info.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
-                  info.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                  info.difficulty === 'Hard' ? 'bg-red-100 text-red-700' :
-                  'bg-gray-100 text-gray-700'
-                }`}>
-                  {info.difficulty}
-                </span>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-white/80 rounded-xl transition-colors text-gray-500">
-              Close
+            <button onClick={onClose} className="p-1.5 sm:p-2 hover:bg-white/80 rounded-lg sm:rounded-xl transition-colors text-gray-500 flex-shrink-0">
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         </div>
         
-        {/* Content */}
-        <div className="p-6 space-y-6">
-          {/* Description */}
-          <div>
-            <p className="text-gray-700">{info.description}</p>
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+          <div className="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg sm:rounded-xl">
+            <span className="font-medium text-gray-900 text-sm sm:text-base">+{task.coins} Coins</span>
+            <span className="font-medium text-gray-900 text-sm sm:text-base">+{task.xp} XP</span>
           </div>
-          
-          {/* Rewards */}
-          <div className="flex gap-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl">
-            <div>
-              <span className="font-medium text-gray-900">+{task.coins} Coins</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-900">+{task.xp} XP</span>
-            </div>
-          </div>
-          
-          {/* Steps */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-3">How to do it</h3>
-            <div className="space-y-2">
-              {info.steps.map((step, index) => (
-                <div key={index} className="flex gap-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
-                    {index + 1}
-                  </div>
-                  <p className="text-gray-700 text-sm">{step}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          {/* Tips */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Pro Tips</h3>
-            <div className="space-y-2">
-              {info.tips.map((tip, index) => (
-                <div key={index} className="flex gap-2 items-start">
-                  <span className="text-gray-400">•</span>
-                  <p className="text-gray-600 text-sm">{tip}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          {/* Benefits */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Benefits</h3>
-            <div className="flex flex-wrap gap-2">
-              {info.benefits.map((benefit, index) => (
-                <span key={index} className="px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm">
-                  {benefit}
-                </span>
-              ))}
-            </div>
-          </div>
-          
-          {/* Muscle Groups */}
-          {info.muscleGroups && info.muscleGroups[0] !== 'N/A - Nutrition task' && info.muscleGroups[0] !== 'N/A - Tracking task' && info.muscleGroups[0] !== 'N/A - Monitoring task' && info.muscleGroups[0] !== 'N/A - Mental wellness task' && info.muscleGroups[0] !== 'N/A - Breathing exercise' && info.muscleGroups[0] !== 'N/A - Sleep wellness task' && info.muscleGroups[0] !== 'N/A - Health monitoring task' && info.muscleGroups[0] !== 'N/A - Therapy task' && info.muscleGroups[0] !== 'N/A - Hydration task' && (
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-3">Target Areas</h3>
-              <div className="flex flex-wrap gap-2">
-                {info.muscleGroups.map((muscle, index) => (
-                  <span key={index} className="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full text-sm">
-                    {muscle}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
         
-        {/* Actions */}
-        <div className="p-6 border-t border-gray-100 flex gap-3">
+        <div className="p-4 sm:p-6 border-t border-gray-100 flex gap-2 sm:gap-3 sticky bottom-0 bg-white rounded-b-2xl sm:rounded-b-3xl">
           <button
             onClick={onFail}
-            className="flex-1 px-4 py-3 border border-red-200 text-red-600 rounded-xl hover:bg-red-50 font-medium transition-colors"
+            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 border border-red-200 text-red-600 rounded-lg sm:rounded-xl hover:bg-red-50 font-medium transition-colors text-sm sm:text-base"
           >
             Skip Task
           </button>
           <button
             onClick={onComplete}
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:shadow-lg font-medium transition-all"
+            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg sm:rounded-xl hover:shadow-lg font-medium transition-all text-sm sm:text-base"
           >
             Mark Complete
           </button>
