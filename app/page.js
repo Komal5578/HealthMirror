@@ -10,6 +10,8 @@ import PlanSelection from './components/PlanSelection';
 import GuiderSetup from './components/GuiderSetup';
 import Dashboard from './components/Dashboard';
 import Shop from './components/Shop';
+import Login from './components/login';
+import Signup from './components/signup';
 export default function Home() {
   const { currentStep } = useStore();
   const [mounted, setMounted] = useState(false);
@@ -43,6 +45,10 @@ export default function Home() {
         return <Dashboard />;
       case 'shop':
         return <Shop />;
+      case 'login':
+        return <Login />;
+      case 'signup':
+        return <Signup />;
       default:
         return <WelcomeScreen />;
     }

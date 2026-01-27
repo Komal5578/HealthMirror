@@ -48,7 +48,7 @@ export default function WelcomeScreen() {
           {/* Start Button */}
           <div className="text-center">
             <button
-              onClick={() => setStep('health-profile')}
+              onClick={() => setStep('login')}
               className="inline-flex items-center gap-3 px-12 py-5 bg-blue-600 hover:bg-blue-700 rounded-xl text-white font-bold text-xl transition-all shadow-2xl hover:shadow-blue-500/30 hover:scale-105"
             >
               Get started
@@ -58,6 +58,22 @@ export default function WelcomeScreen() {
             <p className="text-white/70 text-lg font-medium mt-8">
               Start your personalized health journey today
             </p>
+            
+            {/* Login and Signup Buttons */}
+            <div className="flex items-center justify-center gap-4 mt-8">
+              <button
+                onClick={() => setStep('login')}
+                className="px-8 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white font-semibold text-lg transition-all hover:scale-105"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => setStep('signup')}
+                className="px-8 py-3 bg-white hover:bg-gray-100 rounded-xl text-blue-600 font-semibold text-lg transition-all hover:scale-105"
+              >
+                Sign Up
+              </button>
+            </div>
           </div>
         </div>
       </div>
