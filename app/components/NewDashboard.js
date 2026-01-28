@@ -303,7 +303,7 @@ const PersonalizedHealthDashboard = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                {userData.name}'s Health Analytics
+                Health Analytics
               </h1>
               <p className="text-gray-600 text-lg">
                 Your personalized insights powered by real data
