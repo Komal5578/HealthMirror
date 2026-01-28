@@ -17,7 +17,8 @@ import {
   ArrowRight,
   Settings,
   X,
-  Eye
+  Eye,
+  Pill
 } from 'lucide-react';
 
 const Avatar3D = dynamic(() => import('./Avatar3D'), { 
@@ -38,6 +39,10 @@ const ChatWidget = dynamic(() => import('./ChatWidget'), {
 });
 
 const PersonalizedHealthDashboard = dynamic(() => import('./PersonalizedHealthDashboard'), { 
+  ssr: false 
+});
+
+const MedicineScanner = dynamic(() => import('./MedicineScanner'), { 
   ssr: false 
 });
 
@@ -67,6 +72,7 @@ export default function Dashboard() {
   const [selectedTask, setSelectedTask] = useState(null);
   const [showFuturePreview, setShowFuturePreview] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showMedicineScanner, setShowMedicineScanner] = useState(false);
   
   const completedCount = dailyTasks.filter(t => t.completed).length;
   
@@ -117,6 +123,13 @@ export default function Dashboard() {
                   <span className="font-medium">Lv {guiderLevel}</span>
                 </div>
               </div>
+              <button 
+                onClick={() => setShowMedicineScanner(true)}
+                className="p-1.5 sm:p-2 hover:bg-blue-50 rounded-full transition-colors hidden xs:block"
+                title="Scan Medicine"
+              >
+                <Pill className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              </button>
               <button 
                 onClick={() => setShowConfirmReset(true)}
                 className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -172,6 +185,13 @@ export default function Dashboard() {
                 >
                   <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
                   Future Self
+                </button>
+                <button
+                  onClick={() => setShowMedicineScanner(true)}
+                  className="flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-indigo-600 rounded-lg text-white font-medium hover:bg-indigo-700 transition-colors text-sm sm:text-base"
+                >
+                  <Pill className="w-4 h-4 sm:w-5 sm:h-5" />
+                  Scan Medicine
                 </button>
               </div>
             </div>
@@ -435,6 +455,11 @@ export default function Dashboard() {
       {/* Future Self Preview Modal */}
       {showFuturePreview && (
         <FutureSelfPreview onClose={() => setShowFuturePreview(false)} />
+      )}
+
+      {/* Medicine Scanner Modal */}
+      {showMedicineScanner && (
+        <MedicineScanner onClose={() => setShowMedicineScanner(false)} />
       )}
       
       {/* Chat Widget */}
