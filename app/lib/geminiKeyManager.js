@@ -35,3 +35,10 @@ export function markKeyError(key) {
     currentKeyIndex = (currentKeyIndex + 1) % keys.length;
   }
 }
+
+export function getKeyManager() {
+  return {
+    getKey,
+    markKeyError
+  };
+}
