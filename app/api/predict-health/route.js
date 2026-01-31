@@ -1,4 +1,4 @@
-import { getKey, markKeyError } from '../../lib/geminiKeyManager';
+import { getKey, reportError } from '../../lib/geminiKeyManager';
 
 // Fallback prediction based on data patterns (Option A)
 function getFallbackPrediction(data, years) {
@@ -200,7 +200,7 @@ export async function POST(request) {
     
     // Try AI prediction first (Option B)
     try {
-      const apiKey = getKey();
+      const { key: apiKey, index: keyIndex } = getKey();
       
       if (!apiKey) {
         throw new Error('No API key available');
@@ -251,7 +251,7 @@ Respond in this EXACT JSON format (no markdown, no code blocks, just pure JSON):
       
       if (!response.ok) {
         const errorData = await response.json();
-        markKeyError(apiKey);
+        reportError(keyIndex, new Error(errorData.error?.message || 'AI API failed'));
         throw new Error(errorData.error?.message || 'AI API failed');
       }
       
