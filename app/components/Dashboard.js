@@ -1281,40 +1281,116 @@ function getTaskInfo(taskName) {
 
 // Task Info Modal Component
 function TaskInfoModal({ task, onClose, onComplete, onFail }) {
+  const taskInfo = getTaskInfo(task.name);
+  
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4">
-      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full my-8">
+        {/* Header */}
         <div className="p-4 sm:p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-t-2xl sm:rounded-t-3xl sticky top-0 z-10">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{task.name}</h2>
-              <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500 mt-1">
-                <span>{task.duration}</span>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">{task.name}</h2>
+              <div className="flex items-center gap-3 sm:gap-4 mt-2">
+                <span className="text-xs sm:text-sm text-gray-600">{task.duration}</span>
+                <span className={`text-xs sm:text-sm font-medium px-2 py-1 rounded-full ${
+                  taskInfo.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
+                  taskInfo.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                  'bg-red-100 text-red-700'
+                }`}>
+                  {taskInfo.difficulty}
+                </span>
               </div>
             </div>
-            <button onClick={onClose} className="p-1.5 sm:p-2 hover:bg-white/80 rounded-lg sm:rounded-xl transition-colors text-gray-500 flex-shrink-0">
-              <X className="w-4 h-4 sm:w-5 sm:h-5" />
+            <button onClick={onClose} className="p-2 hover:bg-white/80 rounded-lg transition-colors text-gray-500 flex-shrink-0">
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
         
-        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-          <div className="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg sm:rounded-xl">
-            <span className="font-medium text-gray-900 text-sm sm:text-base">+{task.coins} Coins</span>
-            <span className="font-medium text-gray-900 text-sm sm:text-base">+{task.xp} XP</span>
+        {/* Content */}
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-h-[60vh] overflow-y-auto">
+          {/* Rewards */}
+          <div className="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg">
+            <span className="font-semibold text-gray-900 text-sm sm:text-base">+{task.coins} Coins</span>
+            <span className="font-semibold text-gray-900 text-sm sm:text-base">+{task.xp} XP</span>
+          </div>
+
+          {/* Description */}
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">What is this?</h3>
+            <p className="text-gray-600 text-sm sm:text-base">{taskInfo.description}</p>
+          </div>
+
+          {/* Steps */}
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-3 text-sm sm:text-base">How to do it:</h3>
+            <ol className="space-y-2">
+              {taskInfo.steps.map((step, idx) => (
+                <li key={idx} className="flex gap-3 text-sm sm:text-base">
+                  <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium">
+                    {idx + 1}
+                  </span>
+                  <span className="text-gray-700 flex-1">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          {/* Tips */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
+              <span className="text-yellow-600">💡</span> Pro Tips
+            </h3>
+            <ul className="space-y-1.5">
+              {taskInfo.tips.map((tip, idx) => (
+                <li key={idx} className="text-gray-700 text-sm flex gap-2">
+                  <span className="text-yellow-600">•</span>
+                  <span>{tip}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Benefits */}
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
+              <span className="text-green-600">✨</span> Benefits
+            </h3>
+            <ul className="space-y-1.5">
+              {taskInfo.benefits.map((benefit, idx) => (
+                <li key={idx} className="text-gray-700 text-sm flex gap-2">
+                  <span className="text-green-600">✓</span>
+                  <span>{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Muscle Groups */}
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Target Areas:</h3>
+            <div className="flex flex-wrap gap-2">
+              {taskInfo.muscleGroups.map((muscle, idx) => (
+                <span key={idx} className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs sm:text-sm">
+                  {muscle}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
         
+        {/* Footer Actions */}
         <div className="p-4 sm:p-6 border-t border-gray-100 flex gap-2 sm:gap-3 sticky bottom-0 bg-white rounded-b-2xl sm:rounded-b-3xl">
           <button
             onClick={onFail}
-            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 border border-red-200 text-red-600 rounded-lg sm:rounded-xl hover:bg-red-50 font-medium transition-colors text-sm sm:text-base"
+            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 font-medium transition-colors text-sm sm:text-base"
           >
             Skip Task
           </button>
           <button
             onClick={onComplete}
-            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg sm:rounded-xl hover:shadow-lg font-medium transition-all text-sm sm:text-base"
+            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:shadow-lg font-medium transition-all text-sm sm:text-base"
           >
             Mark Complete
           </button>
